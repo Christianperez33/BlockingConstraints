@@ -1,0 +1,156 @@
+{
+    "status": "OPTIMAL_SOLUTION",
+    "solution": {
+        "objective": 0.0,
+        "start_time": [
+            [
+                21,
+                26,
+                49,
+                46,
+                54,
+                52,
+                67,
+                47,
+                14,
+                78
+            ],
+            [
+                7,
+                12,
+                5,
+                69,
+                67,
+                4,
+                70,
+                19,
+                47,
+                13
+            ],
+            [
+                14,
+                25,
+                7,
+                37,
+                24,
+                19,
+                0,
+                15,
+                78,
+                52
+            ],
+            [
+                20,
+                77,
+                62,
+                21,
+                19,
+                0,
+                37,
+                74,
+                4,
+                14
+            ],
+            [
+                28,
+                57,
+                56,
+                55,
+                0,
+                54,
+                7,
+                1,
+                37,
+                47
+            ]
+        ],
+        "SpeedScaling": [
+            [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+            ]
+        ],
+        "_output_item": "Objective function: -0.0 + 0.0 = 0.0 \nObjective function : M-87.0 + E-4705.0 = 0.0 \nStart Times: [21, 26, 49, 46, 54, 52, 67, 47, 14, 78, 7, 12, 5, 69, 67, 4, 70, 19, 47, 13, 14, 25, 7, 37, 24, 19, 0, 15, 78, 52, 20, 77, 62, 21, 19, 0, 37, 74, 4, 14, 28, 57, 56, 55, 0, 54, 7, 1, 37, 47]\nSpeed Scaling; [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]\n",
+        "_checker": ""
+    },
+    "statistics": {
+        "paths": 0,
+        "flatBoolVars": 200,
+        "flatIntVars": 101,
+        "flatFloatVars": 2,
+        "flatBoolConstraints": 100,
+        "flatIntConstraints": 476,
+        "flatFloatConstraints": 2,
+        "evaluatedHalfReifiedConstraints": 200,
+        "method": "minimize",
+        "flatTime": 54.989000000000004,
+        "time": 75.0,
+        "initTime": 3.039,
+        "solveTime": 0.694,
+        "solutions": 3,
+        "variables": 301,
+        "propagators": 578,
+        "propagations": 13610,
+        "nodes": 84,
+        "failures": 23,
+        "restarts": 0,
+        "peakDepth": 31,
+        "nSolutions": 3
+    }
+}

@@ -1,0 +1,99 @@
+{
+    "status": "OPTIMAL_SOLUTION",
+    "solution": {
+        "objective": 0.8958370494254881,
+        "start_time": [
+            [
+                433,
+                143,
+                350,
+                528,
+                266
+            ],
+            [
+                509,
+                87,
+                211,
+                308,
+                318
+            ],
+            [
+                274,
+                0,
+                113,
+                73,
+                215
+            ],
+            [
+                194,
+                344,
+                60,
+                266,
+                134
+            ],
+            [
+                222,
+                42,
+                195,
+                316,
+                90
+            ]
+        ],
+        "SpeedScaling": [
+            [
+                1,
+                1,
+                1,
+                1,
+                2
+            ],
+            [
+                1,
+                2,
+                2,
+                2,
+                1
+            ],
+            [
+                1,
+                3,
+                2,
+                2,
+                2
+            ],
+            [
+                2,
+                1,
+                2,
+                2,
+                2
+            ],
+            [
+                2,
+                3,
+                2,
+                1,
+                3
+            ]
+        ],
+        "_output_item": "Objective function normalized: M-0.1084592946168125 + E-0.5868694955964773 + T-0.2005082592121982 = 0.8958370494254881 \nObjective function: M-573.0 + E-1376.0 + T-789.0 = 0.8958370494254881 \nStart Times: [433, 143, 350, 528, 266, 509, 87, 211, 308, 318, 274, 0, 113, 73, 215, 194, 344, 60, 266, 134, 222, 42, 195, 316, 90]\nSpeed Scaling; [1, 1, 1, 1, 2, 1, 2, 2, 2, 1, 1, 3, 2, 2, 2, 2, 1, 2, 2, 2, 2, 3, 2, 1, 3]\n",
+        "_checker": ""
+    },
+    "statistics": {
+        "paths": 0,
+        "flatIntVars": 451,
+        "flatFloatVars": 54,
+        "flatIntConstraints": 576,
+        "flatFloatConstraints": 54,
+        "evaluatedHalfReifiedConstraints": 100,
+        "method": "minimize",
+        "flatTime": 90.893,
+        "objective": 0.895837049425,
+        "objectiveBound": 0.895837049425,
+        "nodes": 24200,
+        "solveTime": 39081.200000000004,
+        "time": 5943.0,
+        "openNodes": 1021,
+        "nSolutions": 30
+    }
+}
