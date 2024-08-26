@@ -360,29 +360,29 @@ class JSP:
     def generate_schedule_image(self, schedule):
         pass
 
-    def vectorization(self):
-        vectorization = {}
+    def features(self):
+        features = {}
         # Caracteristicas básicas
-        vectorization["jobs"]           = self.numJobs
-        vectorization["machines"]       = self.numMchs
-        vectorization["rddd"]           = self.rddd
-        vectorization["speed"]          = self.speed
-        vectorization["max_makespan"]    = self.max_makespan
-        vectorization["min_makespan"]    = self.min_makespan
-        vectorization["max_sum_energy"]   = self.max_energy
-        vectorization["min_sum_energy"]   = self.min_energy
-        vectorization["max_tardiness"]   = self.max_tardiness
-        vectorization["min_window"]     = 0
-        vectorization["max_window"]     = 0
-        vectorization["mean_window"]    = 0
-        vectorization["overlap"]        = 0
+        features["jobs"]           = self.numJobs
+        features["machines"]       = self.numMchs
+        features["rddd"]           = self.rddd
+        features["speed"]          = self.speed
+        features["max_makespan"]    = self.max_makespan
+        features["min_makespan"]    = self.min_makespan
+        features["max_sum_energy"]   = self.max_energy
+        features["min_sum_energy"]   = self.min_energy
+        features["max_tardiness"]   = self.max_tardiness
+        features["min_window"]     = 0
+        features["max_window"]     = 0
+        features["mean_window"]    = 0
+        features["overlap"]        = 0
 
         # Caracteristicas complejas
         if self.rddd == 0:
-            vectorization["min_window"]  = -1
-            vectorization["max_window"]  = -1
-            vectorization["mean_window"]  = -1
-            vectorization["overlap"] = -1
+            features["min_window"]  = -1
+            features["max_window"]  = -1
+            features["mean_window"]  = -1
+            features["overlap"] = -1
         else:
             if self.rddd == 1:
                 # Ventana de cada trabajo
@@ -391,20 +391,20 @@ class JSP:
                     tproc_max  = np.sum(np.max(self.ProcessingTime[job,machine,:]) for machine in range(self.numMchs))                    
                     tproc_mean = np.sum(np.mean(self.ProcessingTime[job,machine,:]) for machine in range(self.numMchs)) 
                     window     = self.ReleaseDueDate[job,1] - self.ReleaseDueDate[job,0]
-                    vectorization["min_window"]  += window / tproc_max 
-                    vectorization["max_window"]  += window / tproc_min 
-                    vectorization["mean_window"] += window / tproc_mean 
-                vectorization["min_window"]  = vectorization["min_window"]  / self.numJobs
-                vectorization["max_window"]  = vectorization["max_window"]  / self.numJobs
-                vectorization["mean_window"] = vectorization["mean_window"] / self.numJobs
+                    features["min_window"]  += window / tproc_max 
+                    features["max_window"]  += window / tproc_min 
+                    features["mean_window"] += window / tproc_mean 
+                features["min_window"]  = features["min_window"]  / self.numJobs
+                features["max_window"]  = features["max_window"]  / self.numJobs
+                features["mean_window"] = features["mean_window"] / self.numJobs
                 # Overlap entre trabajos
                 for job in range(self.numJobs):
                     for job2 in range(job + 1, self.numJobs):
                         diff = min(self.ReleaseDueDate[job,1],self.ReleaseDueDate[job2,1])-max(self.ReleaseDueDate[job,0], self.ReleaseDueDate[job2,0])
                         if diff > 0:
-                            vectorization["overlap"] += diff / (self.ReleaseDueDate[job,1] - self.ReleaseDueDate[job,0])
-                            vectorization["overlap"] += diff / (self.ReleaseDueDate[job2,1] - self.ReleaseDueDate[job2,0])
-                vectorization["overlap"] = vectorization["overlap"] / (self.numJobs * (self.numJobs - 1))
+                            features["overlap"] += diff / (self.ReleaseDueDate[job,1] - self.ReleaseDueDate[job,0])
+                            features["overlap"] += diff / (self.ReleaseDueDate[job2,1] - self.ReleaseDueDate[job2,0])
+                features["overlap"] = features["overlap"] / (self.numJobs * (self.numJobs - 1))
             else:
                 # Ventana de cada operacion
                 for job in range(self.numJobs):
@@ -413,180 +413,28 @@ class JSP:
                         tproc_max  = np.max(self.ProcessingTime[job,machine,:])                   
                         tproc_mean = np.mean(self.ProcessingTime[job,machine,:])
                         window     = self.ReleaseDueDate[job,machine,1] - self.ReleaseDueDate[job,machine,0]
-                        vectorization["min_window"]  += window / tproc_max 
-                        vectorization["max_window"]  += window / tproc_min 
-                        vectorization["mean_window"] += window / tproc_mean 
-                vectorization["min_window"]  = vectorization["min_window"]  / (self.numJobs * self.numMchs)
-                vectorization["max_window"]  = vectorization["max_window"]  / (self.numJobs * self.numMchs)
-                vectorization["mean_window"] = vectorization["mean_window"] / (self.numJobs * self.numMchs)
+                        features["min_window"]  += window / tproc_max 
+                        features["max_window"]  += window / tproc_min 
+                        features["mean_window"] += window / tproc_mean 
+                features["min_window"]  = features["min_window"]  / (self.numJobs * self.numMchs)
+                features["max_window"]  = features["max_window"]  / (self.numJobs * self.numMchs)
+                features["mean_window"] = features["mean_window"] / (self.numJobs * self.numMchs)
                 # Overlap entre operaciones
                 for job1 in range(self.numJobs):
                     for machine1 in range(self.numMchs):
                         for job2 in range(job1 + 1, self.numJobs):
                             diff = min(self.ReleaseDueDate[job1,machine1,1],self.ReleaseDueDate[job2,machine1,1])-max(self.ReleaseDueDate[job1,machine1,0],  self.ReleaseDueDate[job2,machine1,0])
                             if diff > 0:
-                                vectorization["overlap"] += diff / (self.ReleaseDueDate[job1,machine1,1] - self.ReleaseDueDate[job1,machine1,0])
-                                vectorization["overlap"] += diff / (self.ReleaseDueDate[job2,machine1,1] -  self.ReleaseDueDate[job2,machine1,0])
-                vectorization["overlap"] = vectorization["overlap"] / (self.numJobs * (self.numJobs - 1) * self.numMchs)   
+                                features["overlap"] += diff / (self.ReleaseDueDate[job1,machine1,1] - self.ReleaseDueDate[job1,machine1,0])
+                                features["overlap"] += diff / (self.ReleaseDueDate[job2,machine1,1] -  self.ReleaseDueDate[job2,machine1,0])
+                features["overlap"] = features["overlap"] / (self.numJobs * (self.numJobs - 1) * self.numMchs)   
         # Estadísticos de los datos
-        vectorization["max_processing_time_value"]     = np.max(self.ProcessingTime)
-        vectorization["min_processing_time_value"]     = np.min(self.ProcessingTime)
-        vectorization["mean_processing_time_value"]    = np.mean(self.ProcessingTime)
+        features["max_processing_time_value"]     = np.max(self.ProcessingTime)
+        features["min_processing_time_value"]     = np.min(self.ProcessingTime)
+        features["mean_processing_time_value"]    = np.mean(self.ProcessingTime)
 
-        vectorization["max_energy_value"]     = np.max(self.ProcessingTime)
-        vectorization["min_energy_value"]     = np.min(self.ProcessingTime)
-        vectorization["mean_energy_value"]    = np.mean(self.ProcessingTime)
+        features["max_energy_value"]     = np.max(self.ProcessingTime)
+        features["min_energy_value"]     = np.min(self.ProcessingTime)
+        features["mean_energy_value"]    = np.mean(self.ProcessingTime)
 
-        return vectorization
-
-    def disjuntive_graph(self):
-        vertex = list(range(self.numJobs * self.numMchs + 2))
-        A = {v:[] for v in vertex}
-        E = {v:[] for v in vertex}
-
-        index = np.arange(1,self.Orden.size).reshape(self.numJobs, self.numMchs)
-
-        # La primera operación de cada trabajo 
-        for v in index[:,0]:
-            A[0].append(v)
-        
-        # La última operación de cada trabajo
-        for v in index[:,-1]:
-            A[v].append(self.numJobs * self.numMchs + 1)
-
-        # Aristas de precedencia
-        for job in range( self.numJobs):
-            for machine in range(1, self.numMchs):
-                A[index[job, machine - 1]].append(index[job,machine])
-        aux = {m:[] for m in range(self.numMchs)}
-        
-        # Aristas disjuntas
-        for job in range(self.numJobs):
-            for machine in range(self.numMchs):
-                aux[self.Orden[job,machine]].append(index[job,machine])
-        
-        for machine, vertex in aux.items():            
-            for v,w in combinations(vertex, 2):
-                A[v].append(w)
-                A[w].append(v)
-        return index, A, E
-    
-    def disjuntive_graph_solution(self, solution):
-        graph = nx.Graph()
-        graph.add_nodes_from([(0, {"valor":0}),(self.numJobs*self.numMchs+1,{"valor":0})])
-        
-        # Datos que se necesitan para construir el grafo
-        orders_done              = [0] * self.numJobs
-        available_time_machines  = [0] * self.numMchs
-        end_time_last_operations = [0] * self.numJobs
-
-        for job, speed in zip(solution[::2], solution[1::2]):
-
-            operation    = orders_done[job]
-            machine      = self.Orden[job,operation]
-            valor        = self.EnergyConsumption[job,machine, speed]   
-
-            # Creo el nodo
-            graph.add_node((job*self.numMchs+operation, {"valor":valor}))   
-            # Añado las aristas de restriccion de precedencia
-            if operation == 0:
-               graph.add_edge((0,job*self.numMchs+operation))
-            if operation == self.numMchs - 1:
-                graph.add_edge((0,self.numJobs*self.numMchs+1))            
-            if operation > 0 and operation < self.numMchs - 1:
-                graph.add_edge((job*self.numMchs+operation-1,job*self.numMchs+operation))
-            # TODO: ACABAR EL GRAFO
-            
-
-
-
-
-
-class Generador:
-    def __init__(self, quantity, jobs, machines, speed, rddd, distribution, path, index = 0, seeds= []) -> None:
-    
-        # Atributos del generador
-        self.Q              = quantity
-        self.numJobs        = jobs
-        self.numMchs        = machines        
-        self.rddd           = rddd
-        self.speed          = speed
-        self.distribution   = distribution
-        self.path           = path
-        self.index          = index
-        if not seeds or len(seeds) < self.Q:
-            self.seeds = range(self.Q)
-        else: 
-            self.seeds = seeds
-
-    # Método encargado de la generacion de los problemas 
-    def generate(self, save=True):
-        problems = []
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-        for q in range(self.Q):
-            if save:
-                os.makedirs(self.path+f"Problema{q + self.index}", exist_ok=True)
-            self.JSP = JSP(self.numJobs, self.numMchs)
-            self.JSP.fill_random_values(self.speed, self.rddd, self.distribution, self.seeds[q])
-            # Una vez generados los datos del problema se generan las estadísticas
-            self.JSP.generate_maxmin_objective_values()
-            if save:
-                self.JSP.savePythonFile(f'./{self.path}/Problema{q+self.index}/Problema{q + self.index}')  
-                self.JSP.saveJsonFile(f'./{self.path}/Problema{q+self.index}/Problema{q+self.index}.json')  
-            problems.append(self.JSP)
-        return problems
-            
-def caller(parameters):
-    callGeneratePaper(**parameters)
-    # callGenerate(**parameters)
-
-def callGenerate(size,jobs,machines,distributions, SpeedScaling, ReleaseDueDate):
-    path = f"./ConjuntoTFG/Trabajos_{jobs}/Maquinas_{machines}/Distribution_{distributions}/SS_{SpeedScaling}/RdDd_{ReleaseDueDate}"
-    os.makedirs(path, exist_ok=True)
-    gen = Generador(size,jobs,machines,SpeedScaling,ReleaseDueDate,distributions, path)
-    gen.generate()
-
-def callGeneratePaper(size, jobs, machines, distributions, SpeedScaling, ReleaseDueDate, index=-1):
-    path = f"./ConjuntoTFG/"
-    os.makedirs(path, exist_ok=True)
-    gen = Generador(size,jobs,machines,SpeedScaling,ReleaseDueDate,distributions, path, index)
-    gen.generate()
-
-if __name__ == "__main__":    
-    
-    parameters  = {
-        "size" : [10], # Cantidad de instancias de cada tipo
-        "jobs" : [5,10,20,25,50,100],
-        "machines" : [5,10,20,25,50,100],
-        "distributions": ["normal", "uniform", "exponential"],
-        "Speed-Scaling": [5],
-        "ReleaseDueDate" : [2]
-    }
-
-    # parameters  = {
-    #     "size" : [1], # Cantidad de instancias de cada tipo
-    #     "jobs" : [3],
-    #     "machines" : [2],
-    #     "distributions": ["normal"],
-    #     "Speed-Scaling": [3],
-    #     "ReleaseDueDate" : [0]
-    # }
-        
-    combinations = list(product(*parameters.values()))
-    parameter_vectors = [{"size":size,"jobs": jobs, "machines": machines, "distributions": dist, "SpeedScaling": speed, "ReleaseDueDate": release, "index" : size*i}
-                     for i,(size,jobs, machines, dist, speed, release) in enumerate(combinations)]
-
-    for params in parameter_vectors:
-        caller(params)
-    # with ProcessPoolExecutor(multiprocessing.cpu_count()) as executor: # multiprocessing.cpu_count()
-    #     futures = executor.map(caller,parameter_vectors)
-    #      # Esperar a que todos los procesos terminen
-    #     for future in as_completed(futures):
-    #         try:
-    #             future.result()  # Espera a que el proceso termine y maneja cualquier excepción
-    #         except Exception as e:
-    #             print(f"Error en una tarea: {e}")
-
-    # gen = Generador(1,3,2,3,1,"normal","./Pruebas/")
-    # gen.generate()
+        return features
