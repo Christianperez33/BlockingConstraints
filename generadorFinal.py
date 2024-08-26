@@ -2,17 +2,10 @@
 #                       LIBRERIAS                          #
 ############################################################
 import numpy as np
-import random
 from scipy.stats import norm, uniform, expon
 import pickle
 import json
-import os
-import multiprocessing
-from concurrent.futures import ProcessPoolExecutor, as_completed
-from itertools import product, combinations
 import copy
-import networkx as nx
-
 ############################################################
 #                       GENERADOR                          #
 ############################################################
@@ -46,17 +39,7 @@ class JSP:
 
         self.rddd = rddd
         self.speed = speed
-
-        # # En caso de que no se proporcione una lista de tiempos de procesamiento se va a generar para cada máquina
-        # # Se considera que las máquinas tienen al menos un consumo de 10 unidades de tiempo.
-        # if not tpm:
-        #     if distribution == "uniform":
-        #         tpm = np.random.uniform(10,100,self.numMchs)
-        #     elif distribution == "normal":
-        #         tpm = [max(10, data) for data in np.random.normal(50,20,self.numMchs)]
-        #     else:
-        #         tpm = expon(loc=10,scale=20).rvs(self.numMchs)
-       
+        
         # Particion del intervalo [0.5, 3]
         energyPer, timePer = self._particionate_speed_space(speed)
 
@@ -360,13 +343,36 @@ class JSP:
     def generate_schedule_image(self, schedule):
         pass
 
+    
+    ######################
+    ##     FEATURES     ##
+    ######################
+    def std_makespan(self):
+        norm_time = (self.ProcessingTime - self.ProcessingTime.min())/(self.ProcessingTime.max() - self.ProcessingTime.min())
+
+        std_job = [np.std(norm_time[job,:,:]) for job in range(self.numJobs)]
+        std_task = [np.std(norm_time[:,machine,:]) for machine in range(self.numMchs)]
+        
+        
+        return std_job,std_task
+    
+    def std_energy(self):
+        norm_energy = (self.EnergyConsumption - self.EnergyConsumption.min())/(self.EnergyConsumption.max() - self.EnergyConsumption.min())
+
+        std_job = [np.std(norm_energy[job,:,:]) for job in range(self.numJobs)]
+        std_task = [np.std(norm_energy[:,machine,:]) for machine in range(self.numMchs)]
+        
+        
+        return std_job,std_task
+    
     def features(self):
         features = {}
-        # Caracteristicas básicas
+        # Basic features
         features["jobs"]           = self.numJobs
         features["machines"]       = self.numMchs
         features["rddd"]           = self.rddd
         features["speed"]          = self.speed
+        
         features["max_makespan"]    = self.max_makespan
         features["min_makespan"]    = self.min_makespan
         features["max_sum_energy"]   = self.max_energy
@@ -376,8 +382,28 @@ class JSP:
         features["max_window"]     = 0
         features["mean_window"]    = 0
         features["overlap"]        = 0
+        ##New features
+        # Makespan
+        features["max_makespan_job"]   = [self.ProcessingTime[job,:,:].max() for job in range(self.numJobs)]
+        features["max_makespan_task"]  = [self.ProcessingTime[:,machine,:].max() for machine in range(self.numMchs)]
+        features["min_makespan_job"]   = [self.ProcessingTime[job,:,:].min() for job in range(self.numJobs)]
+        features["min_makespan_task"]  = [self.ProcessingTime[:,machine,:].min() for machine in range(self.numMchs)]
+        # Energy
+        features["max_energy_job"]     = [self.EnergyConsumption[job,:,:].max() for job in range(self.numJobs)]
+        features["max_energy_task"]    = [self.EnergyConsumption[:,machine,:].max() for machine in range(self.numMchs)]
+        features["min_energy_job"]     = [self.EnergyConsumption[job,:,:].min() for job in range(self.numJobs)]
+        features["min_energy_task"]    = [self.EnergyConsumption[:,machine,:].min() for machine in range(self.numMchs)]
+        # Tardiness
+        if self.rddd > 0:
+            features["max_tardiness"] = self.max_makespan
+        else:
+            features["max_tardiness"] = -1
+        
+        
+        features["std_makespan_job"],features["std_makespan_task"] = self.std_makespan()
+        features["std_energy_job"],features["std_energy_task"] = self.std_energy()
+        
 
-        # Caracteristicas complejas
         if self.rddd == 0:
             features["min_window"]  = -1
             features["max_window"]  = -1
