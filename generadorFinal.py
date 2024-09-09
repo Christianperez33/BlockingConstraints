@@ -6,6 +6,7 @@ from scipy.stats import norm, uniform, expon
 import pickle
 import json
 import copy
+import pandas as pd
 ############################################################
 #                       GENERADOR                          #
 ############################################################
@@ -388,22 +389,20 @@ class JSP:
         features["max_makespan_task"]  = [self.ProcessingTime[:,machine,:].max() for machine in range(self.numMchs)]
         features["min_makespan_job"]   = [self.ProcessingTime[job,:,:].min() for job in range(self.numJobs)]
         features["min_makespan_task"]  = [self.ProcessingTime[:,machine,:].min() for machine in range(self.numMchs)]
+        features["std_makespan_job"],features["std_makespan_task"] = self.std_makespan()
         # Energy
         features["max_energy_job"]     = [self.EnergyConsumption[job,:,:].max() for job in range(self.numJobs)]
         features["max_energy_task"]    = [self.EnergyConsumption[:,machine,:].max() for machine in range(self.numMchs)]
         features["min_energy_job"]     = [self.EnergyConsumption[job,:,:].min() for job in range(self.numJobs)]
         features["min_energy_task"]    = [self.EnergyConsumption[:,machine,:].min() for machine in range(self.numMchs)]
-        # Tardiness
-        if self.rddd > 0:
-            features["max_tardiness"] = self.max_makespan
-        else:
-            features["max_tardiness"] = -1
-        
-        
-        features["std_makespan_job"],features["std_makespan_task"] = self.std_makespan()
         features["std_energy_job"],features["std_energy_task"] = self.std_energy()
+        # Tardiness
+        features["tardiness"] = np.zeros((self.numJobs,self.numMchs))
+        # if self.rddd > 0:
+        #     features["max_tardiness"] = self.max_makespan
+        # else:
         
-
+        
         if self.rddd == 0:
             features["min_window"]  = -1
             features["max_window"]  = -1
@@ -462,5 +461,27 @@ class JSP:
         features["max_energy_value"]     = np.max(self.ProcessingTime)
         features["min_energy_value"]     = np.min(self.ProcessingTime)
         features["mean_energy_value"]    = np.mean(self.ProcessingTime)
+        
+        ##Correlación de Pearson - medida de dependencia lineal entre dos variables aleatorias cuantitativas
+        #  R = 1 -> dependencia total entre las dos variables denominada relación directa: cuando una de ellas aumenta, la otra también lo hace en proporción constante.
+        #  0 < R < 1 -> correlación positiva
+        # -1 < R < 0 -> correlación negativa
+        #  R = -1 -> dependencia total entre las dos variables llamada relación opuesta: cuando una de ellas aumenta, la otra cambia su signo en proporción constante.
+        #Cuanto mayor sea R mayor mas rapido crecen los valores time-energy y viceversa
+        features["pearson"]={"job":{},"machine":{},"speed":{},"job_machine":np.zeros((self.numJobs,self.numMchs)),"job_speed":np.zeros((self.numJobs,self.speed)),"machine_speed":np.zeros((self.numMchs,self.speed))}
 
+        
+        for j in range(self.numJobs):
+            features["pearson"]["job"][j] = np.corrcoef(self.ProcessingTime[j],self.EnergyConsumption[j]).sum()
+            for m in range(self.numMchs):
+                features["pearson"]["machine"][j] = np.corrcoef(self.ProcessingTime[:,m],self.EnergyConsumption[:,m]).sum()
+                features["pearson"]["job_machine"][j,m] = np.corrcoef(self.ProcessingTime[j,m,:],self.EnergyConsumption[j,m,:]).sum()
+                for s in range(self.speed):
+                    features["pearson"]["speed"][s] = np.corrcoef(self.ProcessingTime[:,:,s],self.EnergyConsumption[:,:,s]).sum()
+                    features["pearson"]["job_speed"][j,s] = np.corrcoef(self.ProcessingTime[j,:,s],self.EnergyConsumption[j,:,s]).sum()
+                    features["pearson"]["machine_speed"][m,s] = np.corrcoef(self.ProcessingTime[:,m,s],self.EnergyConsumption[:,m,s]).sum()
+        
+        print(features["pearson"])
+        
+        quit()
         return features
