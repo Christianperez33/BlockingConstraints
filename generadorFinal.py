@@ -472,14 +472,15 @@ class JSP:
 
         
         for j in range(self.numJobs):
-            features["pearson"]["job"][j] = np.corrcoef(self.ProcessingTime[j],self.EnergyConsumption[j]).sum()
+            features["pearson"]["job"][j] = np.corrcoef(self.ProcessingTime[j],self.EnergyConsumption[j],rowvar=self.speed!=1).sum()
             for m in range(self.numMchs):
-                features["pearson"]["machine"][j] = np.corrcoef(self.ProcessingTime[:,m],self.EnergyConsumption[:,m]).sum()
-                features["pearson"]["job_machine"][j,m] = np.corrcoef(self.ProcessingTime[j,m,:],self.EnergyConsumption[j,m,:]).sum()
+                features["pearson"]["machine"][j] = np.corrcoef(self.ProcessingTime[:,m],self.EnergyConsumption[:,m],rowvar=self.speed!=1).sum()
+                if self.speed!=1:
+                    features["pearson"]["job_machine"][j,m] = np.corrcoef(self.ProcessingTime[j,m,:],self.EnergyConsumption[j,m,:]).sum()
                 for s in range(self.speed):
-                    features["pearson"]["speed"][s] = np.corrcoef(self.ProcessingTime[:,:,s],self.EnergyConsumption[:,:,s]).sum()
-                    features["pearson"]["job_speed"][j,s] = np.corrcoef(self.ProcessingTime[j,:,s],self.EnergyConsumption[j,:,s]).sum()
-                    features["pearson"]["machine_speed"][m,s] = np.corrcoef(self.ProcessingTime[:,m,s],self.EnergyConsumption[:,m,s]).sum()
+                    features["pearson"]["speed"][s] = np.corrcoef(self.ProcessingTime[:,:,s],self.EnergyConsumption[:,:,s],rowvar=self.speed!=1).sum()
+                    features["pearson"]["job_speed"][j,s] = np.corrcoef(self.ProcessingTime[j,:,s],self.EnergyConsumption[j,:,s],rowvar=self.speed!=1).sum()
+                    features["pearson"]["machine_speed"][m,s] = np.corrcoef(self.ProcessingTime[:,m,s],self.EnergyConsumption[:,m,s],rowvar=self.speed!=1).sum()
         
         print(features["pearson"])
         
