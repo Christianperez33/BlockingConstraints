@@ -7,6 +7,7 @@ import pickle
 import json
 import copy
 import pandas as pd
+import matplotlib.pyplot as plt
 ############################################################
 #                       GENERADOR                          #
 ############################################################
@@ -472,7 +473,18 @@ class JSP:
 
         
         for j in range(self.numJobs):
-            features["pearson"]["job"][j] = np.corrcoef(self.ProcessingTime[j],self.EnergyConsumption[j],rowvar=self.speed!=1).sum()
+            x = np.corrcoef(self.ProcessingTime[j],self.EnergyConsumption[j],rowvar=self.speed!=1)
+            # np.fill_diagonal(x, 0)
+            features["pearson"]["job"][j] = x.sum()
+            # for m in range(self.numMchs):
+            #     plt.plot(self.ProcessingTime[j,m,:], 'r')
+            #     plt.plot(self.EnergyConsumption[j,m,:], 'g')
+            #     plt.show()
+            # print(self.ProcessingTime[j,m,:])
+            print(x.shape)
+            print(features["pearson"]["job"][j])
+            quit()
+            
             for m in range(self.numMchs):
                 features["pearson"]["machine"][j] = np.corrcoef(self.ProcessingTime[:,m],self.EnergyConsumption[:,m],rowvar=self.speed!=1).sum()
                 if self.speed!=1:
@@ -484,5 +496,4 @@ class JSP:
         
         print(features["pearson"])
         
-        quit()
         return features
